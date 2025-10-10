@@ -19,6 +19,9 @@ import time
 
 class DHT11fanTask:
     """
+    该类用于控制DHT11温湿度传感器、雾化器和风扇。
+    主要功能：每次调用tick方法时，读取两次温湿度数据，根据温度≥30℃或湿度≥70%来控制风扇转速和雾化器开关，
+    并可选打印当前温湿度。 、
     """
     def __init__(self, DHT11, atomizer, fan, debug=True):
         self.DHT11 = DHT11
