@@ -1,7 +1,7 @@
 # Python env   : MicroPython v1.23.0
 # -*- coding: utf-8 -*-        
-# @Time    : 2025/10/10 上午11:00
-# @Author  : 侯钧瀚
+# @Time    : 2025/9/9 下午11:17   
+# @Author  : 李清水            
 # @File    : main.py       
 # @Description : 主程序文件夹，主要用于初始化配置、创建任务和启动任务。
 # @License : CC BY-NC 4.0
@@ -9,9 +9,10 @@
 # ======================================== 导入相关模块 =========================================
 
 # 导入硬件相关模块
-from machine import Pin, I2C, Timer,ADC
+from machine import Pin, I2C, Timer
 # 导入时间相关模块
 import time
+
 # 导入板级支持包
 import board
 # 导入配置文件
@@ -19,17 +20,22 @@ from conf import *
 # 导入lib文件夹下面自定义库
 from libs.scheduler import Scheduler, Task
 # 导入drivers文件夹下面传感器模块驱动库
-from drivers.flame_driver import FlameSensor
-from drivers.mqx_driver import MQX
-from drivers.led_single_driver import PowerLED
+from drivers.dht11_driver import DHT11, InvalidPulseCount, InvalidChecksum
+from drivers.ne555_atomization_driver import Atomization
+from drivers.fan_pwm_driver import FanPWM
 # 导入tasks文件夹下面任务模块
 from tasks.maintenance import task_idle_callback, task_err_callback
 from tasks.maintenance import GC_THRESHOLD_BYTES, ERROR_REPEAT_DELAY_S
-from tasks.sensor_task import GasFireAlarmTask
+from tasks.sensor_task import DHT11fanTask
 
 # ======================================== 全局变量 ============================================
 
 
+# I2C外设初始化错误记录
+last_err = None
+
+# 按键按下全局标志位
+button_pressed = False
 
 # ======================================== 功能函数 ============================================
 
@@ -106,7 +112,7 @@ def fatal_hang(led: Pin, msg: str,
         while True:
             time.sleep(1)
 
-def fire_callback(pin: Pin) -> None:
+def button_handler(pin: Pin) -> None:
     """
     外部中断回调：切换任务运行/暂停状态。
 
@@ -124,7 +130,6 @@ def fire_callback(pin: Pin) -> None:
         - 该函数设计为中断回调（ISR）使用，应尽量保持简短与非阻塞，避免大量内存分配和长时间阻塞操作。
         - 这里包含少量打印（仅在 ENABLE_DEBUG 打开时）与 try/except 捕获，用于兼容调试与保证回调的稳健性。
     """
-
 # ======================================== 自定义类 ============================================
 
 # ======================================== 初始化配置 ==========================================
@@ -132,20 +137,27 @@ def fire_callback(pin: Pin) -> None:
 # 上电延时3s
 time.sleep(3)
 # 打印调试信息
-print("FreakStudio : MQ2 flame alarm in GraftPort-RP2040")
+print("FreakStudio : dht11_fan_usfp in GraftPort-RP2040")
 
 # 获取板载LED的固定引脚
 led_pin = board.get_fixed_pin("LED")
+# 获取板载按键的固定引脚
+led = Pin(led_pin, Pin.OUT)
+# AIN2 引脚(GPIO28)
+dht11_pin = board.get_adc_pins(2)[0]
+# 初始化单总线通信引脚，下拉输出
 
-# 获取火焰传感器引脚
-flame_DIN = board.get_adc_pins(1)[0]  # DIO1 引脚(GPIO20)
-flame_AIN = board.get_adc_pins(1)[1]  # ADC1 引脚(GPIO27)
+# DIO0 引脚(GPIO6)
+atomizer_pin =board.get_dio_pins(0)[0]
+# AIN1 引脚(GPIO27)
+fan_pin = board.get_adc_pins(1)[0]
 
-# 获取MQ2传感器引脚
-mq2_DIN = board.get_adc_pins(2)[0]  # ADC2 引脚(GPIO28)
-# 获取数字接口0的引脚编号
-d0_pin = board.get_dio_pins(0)[0]  # DIO0 引脚(GPIO6)
+# DHT11实例
+dht11 = DHT11(Pin(dht11_pin, Pin.OUT, Pin.PULL_DOWN))
+# 雾化器实例
+atomizer = Atomization(pin=atomizer_pin)
 
+fan = FanPWM(pin=fan_pin)
 # 输出调试消息
 print("All peripherals initialized.")
 
@@ -153,21 +165,12 @@ print("All peripherals initialized.")
 print("GC threshold:", GC_THRESHOLD_BYTES)
 print("Error repeat delay:", ERROR_REPEAT_DELAY_S)
 
-flame_sensor = FlameSensor(analog_pin=flame_DIN, digital_pin=flame_AIN)
-
-mq = MQX(comp_pin=Pin(mq2_DIN, Pin.IN), user_cb=fire_callback, rl_ohm=10000, vref=3.3,irq_trigger=Pin.IRQ_FALLING)
-
-# 选择内置多项式（MQ2、MQ4、MQ7）
-mq.select_builtin("MQ2")
-
-led = PowerLED(pin=board.get_dio_pins(0)[0], pwm_freq=1000)
-
 # 创建传感器-蜂鸣器-LED任务实例
-sensor_task_obj = GasFireAlarmTask(led=led, flame_sensor=flame_sensor, mq2=mq, debug=True)
+sensor_task_obj = DHT11fanTask(DHT11=dht11, atomizer=atomizer, fan=fan, debug=True)
 sensor_task = Task(sensor_task_obj.tick, interval=200,  state=Task.TASK_RUN)
 
 # 创建任务调度器,定时周期为50ms
-sc = Scheduler(Timer(-1), interval=10, task_idle=task_idle_callback, task_err=task_err_callback)
+sc = Scheduler(Timer(-1), interval=50, task_idle=task_idle_callback, task_err=task_err_callback)
 
 # 添加任务
 sc.add(sensor_task)
