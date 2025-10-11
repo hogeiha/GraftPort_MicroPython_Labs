@@ -28,17 +28,17 @@ class musicTask:
         self.DYSV19T = DYSV19T
         self.debug = debug
         self.count = 0
-        # self.tick = 0
+        self.time_segment = 0
 
 
 
     def tick(self):
         print("count:", self.count)
-        # if self.count != 0:
-        #     self.tick += 1
-        #     if self.tick >= 25:
-        #         self.tick = 0
-        #         self.count = 0
+        if self.count != 0:
+            self.time_segment += 1
+            if self.time_segment >= 25:
+                self.time_segment = 0
+                self.count = 0
 
 
         if self.count >=3:
