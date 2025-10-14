@@ -233,7 +233,7 @@ print("Error repeat delay:", ERROR_REPEAT_DELAY_S)
 
 # 创建传感器-蜂鸣器-LED任务实例
 sensor_task_obj = sensorTask(PCF8574IO8=io8, VibrationMotor=motor, Buzzer=buzzer,debug=True)
-sensor_task = Task(sensor_task_obj.tick, interval=200,  state=Task.TASK_RUN)
+sensor_task = Task(sensor_task_obj.tick, interval=50,  state=Task.TASK_RUN)
 
 # 创建任务调度器,定时周期为50ms
 sc = Scheduler(Timer(-1), interval=50, task_idle=task_idle_callback, task_err=task_err_callback)

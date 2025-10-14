@@ -25,34 +25,34 @@ class sensorTask:
         self.VibrationMotor = VibrationMotor
         self.Buzzer = Buzzer
         self.debug = debug
-        # 初始化按键状态默认2无效
-        self.key = [2,2,2,2]
+        # 初始化按键状态默认
+        self.key = [0,0,0,0]
         self.Buzzer_hz = 0
         self.state = False
 
     def tick(self):
         #循环执行三次 读取按键状态
         for i in range(4):
-            self.key[i] = self.PCF8574IO8.ports_state(i)
+            self.key[i] = self.PCF8574IO8.get_port(i)
         if self.debug:
             print("key=",self.key)
-        if self.key[0]== 1:
+        if self.key[0] != 3:
             self.VibrationMotor.on()
-        if self.key[1] == 1:
+        if self.key[1] != 3:
             self.VibrationMotor.off()
-        if self.key[2] == 1:
+        if self.key[2] != 3:
             self.state = True
             self.Buzzer_hz += 200
-        if self.key[3] == 1:
+        if self.key[3] != 3:
             self.state = False
             self.Buzzer_hz = 0
 
         if self.state:
-            self.Buzzer.play_tone(self.Buzzer_hz)
+            self.Buzzer.play_tone(self.Buzzer_hz,500)
             if self.debug:
                 print("Buzzer_hz=",self.Buzzer_hz)
         else:
-            self.Buzzer.stop_tone()
+            self.Buzzer.stop()
             if self.debug:
                 print("Buzzer_stop")
 
