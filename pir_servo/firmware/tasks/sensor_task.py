@@ -25,17 +25,22 @@ class sensorTask:
         self.BusPWMServoController = BusPWMServoController
         self.debug = debug
         self.BusPWMServoController.attach_servo(0, BusPWMServoController.SERVO_180, min_us=500, max_us=2500, neutral_us=1500)
+        self.BusPWMServoController.attach_servo(1, BusPWMServoController.SERVO_180, min_us=500, max_us=2500, neutral_us=1500)
     def tick(self):
         if self.PIRSensor.is_motion_detected():
             if self.debug:
                 print("检测到人体")
             self.BusPWMServoController.set_angle(0, 90)
+            self.BusPWMServoController.set_angle(1, 90)
             time.sleep(1)
             self.BusPWMServoController.set_angle(0, 0)
+            self.BusPWMServoController.set_angle(1, 0)
             time.sleep(1)
             self.BusPWMServoController.set_angle(0, 90)
+            self.BusPWMServoController.set_angle(1, 90)
             time.sleep(1)
             self.BusPWMServoController.set_angle(0, 0)
+            self.BusPWMServoController.set_angle(1, 0)
 
 
 
