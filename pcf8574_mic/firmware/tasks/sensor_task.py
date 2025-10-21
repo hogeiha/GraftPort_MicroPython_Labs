@@ -33,9 +33,11 @@ class micTask:
         # 输出格式：原始值 高通值 （空格分隔）
         print("{:.4f}".format(result['energy']))
         # 控制绘图刷新速率（建议 >= 200Hz）
-        self.LEDBar.display_level(int(result['energy']))
-
-
+        if int(result['energy'])>= 8:
+            ledlevel=8
+        else:
+            ledlevel=int(result['energy'])
+        self.LEDBar.display_level(ledlevel)
 
 
 # ======================================== 初始化配置 ==========================================
