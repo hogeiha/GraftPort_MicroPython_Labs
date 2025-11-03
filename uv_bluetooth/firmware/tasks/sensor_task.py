@@ -19,7 +19,13 @@ import time
 
 class uvOledTask:
     """
-    """
+       任务1：每 200ms 运行一次
+       构造参数：
+           HC08: HC08 实例，提供 send_data()
+           GUVA_S12SD: GUVA_S12SD 实例，提供 uvi
+          SSD1306_I2C: SSD1306_I2C 实例，提供 show()/fill()/text()
+           enable_debug, min_dist, max_dist
+       """
     def __init__(self, HC08, GUVA_S12SD, SSD1306_I2C, debug=True):
         self.HC08 = HC08
         self.GUVA_S12SD = GUVA_S12SD
@@ -33,20 +39,30 @@ class uvOledTask:
 
 
     def tick(self):
+        """
+         调度器每 200ms 调用一次：
+        1)从GUVA_S12SD读取uv光强
+
+        """
+        # 获取uv传感器光照强度
         self.uv_level = self.GUVA_S12SD.uvi
+        # 更新数据包
         hcdata = bytes([0xA5, self.uv_level, self.uv_level, 0x5A])
+        # 发送数据包
         self.HC08.send_data(hcdata)
         if self.debug:
             print("UV Level:", self.uv_level)
+        # 当uv强度有变化
         if self.uv_level != self.uv_last:
             # 首先清除屏幕
             self.SSD1306_I2C.fill(0)
             self.SSD1306_I2C.show()
             # (0,0)原点位置为屏幕左上角，右边为x轴正方向，下边为y轴正方向
-            # 显示文本
+            # 显示文本与参数
             self.SSD1306_I2C.text(f"UV Level:{str(self.uv_level)}", 0, 5)
             # 显示图像
             self.SSD1306_I2C.show()
+            # 刷新uv_last
             self.uv_last = self.uv_level
 
 

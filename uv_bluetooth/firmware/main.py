@@ -12,7 +12,6 @@
 from machine import Pin, I2C, Timer,UART
 # 导入时间相关模块
 import time
-
 # 导入板级支持包
 import board
 # 导入配置文件
@@ -175,13 +174,13 @@ uart0 = UART(0, baudrate=9600, tx=Pin(hc_tx), rx=Pin(hc_rx))
 hc0 = HC08(uart0)
 
 # uv传感器引脚
-guva_pin=board.get_adc_pins(0)[0]
+guva_pin = board.get_adc_pins(0)[0]
 # 创建uv传感器的实例
-uv_sensor=GUVA_S12SD(guva_pin)
+uv_sensor = GUVA_S12SD(guva_pin)
 
 # 获取I2C0的引脚编号
 i2c0_sda_pin , i2c0_scl_pin = board.get_i2c_pins(0)
-# 创建硬件I2C的实例，使用I2C1外设，时钟频率为400KHz，SDA引脚为6，SCL引脚为7
+# 创建硬件I2C的实例，使用I2C0外设，时钟频率为400KHz，SDA引脚为6，SCL引脚为7
 i2c = I2C(id=0, sda=i2c0_sda_pin, scl=i2c0_scl_pin, freq=I2C0_FREQ)
 
 # 开始扫描I2C总线上的设备，返回从机地址的列表
