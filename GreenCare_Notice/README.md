@@ -66,22 +66,37 @@
 
 ## 文件结构（File Structure）
 ```
-firmware/
-├── boot.py            # 启动脚本，初始化板载 LED，为系统启动做准备
-├── main.py            # 项目入口文件，负责硬件初始化、任务创建与调度启动
-├── board.py           # 板级支持文件，定义 GraftPort-RP2040 的引脚映射
-├── conf.py            # 配置文件，存放可自定义参数（GC 阈值、调试开关等）
-├── drivers/           # 硬件驱动文件夹，封装各外设的控制接口
-│   ├── passive_buzzer_driver/  # 无源蜂鸣器驱动，提供play_tone()方法
-│   ├── piranha_led_driver/     # Piranha LED 驱动，提供set_brightness()方法
-│   ├── potentiometer_driver/   # 滑动变阻器驱动，提供read_value()方法
-│   ├── soil_moisture_driver/   # 土壤湿度传感器驱动，提供read_humidity()方法
-│   └── ssd1306_driver/         # SSD1306 OLED 驱动，提供display_data()方法
-├── libs/              # 通用工具库文件夹
-│   └── scheduler.py   # 任务调度器库，实现多任务周期管理、空闲 / 异常回调
-└── tasks/             # 任务逻辑文件夹，与硬件驱动解耦
-    ├── maintenance.py # 维护任务模块，提供自动 GC、异常处理函数
-    └── sensor_task.py # 核心任务模块，定义SoilMonitorTask类，实现监测逻辑
+GreenCare_Notice
+├─ .flake8
+├─ LICENSE
+├─ README.md
+├─ tools
+│  ├─ dependency_analyzer.py
+│  ├─ mpy_compiler.py
+│  ├─ mpy_uploader.py
+│  └─ README.md
+├─ firmware
+│  ├─ board.py
+│  ├─ boot.py
+│  ├─ conf.py
+│  ├─ main.py
+│  ├─ tasks
+│  │  ├─ maintenance.py
+│  │  ├─ sensor_task.py
+│  │  └─ __init__.py
+│  ├─ libs
+│  │  ├─ __init__.py
+│  │  └─ scheduler
+│  └─ drivers
+│     ├─ __init__.py
+│     ├─ ssd1306_driver
+│     ├─ soil_moisture_driver
+│     ├─ potentiometer_driver
+│     ├─ piranha_led_driver
+│     └─ passive_buzzer_driver
+├─ examples
+│  └─ README.md
+└─ docs
 
 ```
 
