@@ -2,4 +2,8 @@
 
 __pycache__
 
-proximity_music_light/build
+proximity_music_light/build/*
+!proximity_music_light/build/README.md
+
+ir_data_communication/build/*
+!ir_data_communication/build/build_here
