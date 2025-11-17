@@ -9,7 +9,7 @@
 - [硬件要求（Hardware Requirements）](#硬件要求hardware-requirements)
 - [软件环境（Software Environment）](#软件环境software-environment)
 - [文件结构（File Structure）](#文件结构file-structure)
-- [文件说明（File Description）](#文件说明file-description)
+- [关键文件说明（File Description）](#关键文件说明file-description)
 - [软件设计核心思想（Design Idea）](#软件设计核心思想design-idea)
 - [使用说明（Quick Start）](#使用说明quick-start)
 - [示例程序（Example）](#示例程序example)

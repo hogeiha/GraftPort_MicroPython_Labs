@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2025/10/10 下午5:15
 # @Author  : 缪贵成
-# @File    : tasksensor.py
+# @File    : sensor_task.py
 # @Description : 读取 TCS34725 RGB 传感器，根据颜色判断播放对应频率音调
 # @License : CC BY-NC 4.0
 
