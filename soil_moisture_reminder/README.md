@@ -189,7 +189,6 @@ soil_moisture_reminder
 ![](docs/XZRhbvPbsopCKKxzQiPcK2JwnLc.png)
 
 - **系统分层思路**：解耦与复用
-
   - **硬件驱动层**（`drivers/`）：仅负责外设底层控制，不包含业务逻辑，如 `OLED` 驱动只关心“如何显示数据”，不关心“显示什么数据”；
   - **任务逻辑层**（`tasks/`）：基于驱动层接口实现业务流程，`SoilMonitorTask` 调用驱动方法完成监测与反馈，不依赖具体引脚配置；
   - **调度控制层**（`libs/scheduler.py`）：提供通用任务管理能力，支持任务周期调度、暂停/恢复、异常回调，适配多场景需求；
